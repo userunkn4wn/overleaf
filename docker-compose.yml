@@ -1,8 +1,6 @@
 services:
     sharelatex:
         restart: always
-        # Server Pro users:
-        # image: quay.io/sharelatex/sharelatex-pro
         image: sharelatex/sharelatex:with-texlive-full
         container_name: sharelatex
         depends_on:
@@ -11,15 +9,10 @@ services:
             redis:
                 condition: service_started
         ports:
-            - 80:80
+            - 127.0.0.1:80:80
         stop_grace_period: 60s
         volumes:
-            - ~/sharelatex_data:/var/lib/overleaf
-            ########################################################################
-            ####  Server Pro: Uncomment the following line to mount the docker  ####
-            ####             socket, required for Sibling Containers to work    ####
-            ########################################################################
-            # - /var/run/docker.sock:/var/run/docker.sock
+            - ~/overleaf_local/sharelatex_data:/var/lib/overleaf
         environment:
 
             OVERLEAF_APP_NAME: Overleaf Community Edition
@@ -74,7 +67,7 @@ services:
         container_name: mongo
         command: '--replSet overleaf'
         volumes:
-            - ~/mongo_data:/data/db
+            - ~/overleaf_local/mongo_data:/data/db
             - ./bin/shared/mongodb-init-replica-set.js:/docker-entrypoint-initdb.d/mongodb-init-replica-set.js
         environment:
           MONGO_INITDB_DATABASE: sharelatex
@@ -93,7 +86,7 @@ services:
         image: redis:6.2
         container_name: redis
         volumes:
-            - ~/redis_data:/data
+            - ~/overleaf_local/redis_data:/data
 
     # ldap:
     #    restart: always
@@ -117,6 +110,12 @@ services:
 
 
 
+
+###### info ######
+
 # neues image sharelatex:with-texlive-full erstellt mit
 # docker exec sharelatex tlmgr install scheme-full   # installiert full tex live in virtuelle umgebung
 # docker commit sharelatex sharelatex/sharelatex:with-texlive-full # committed diese container variation in neues image in dem diese pakete ab start installiert sind
+
+# docker compose up -d       
+# docker compose down 
