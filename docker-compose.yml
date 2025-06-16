@@ -1,10 +1,9 @@
-version: '2.2'
 services:
     sharelatex:
         restart: always
         # Server Pro users:
         # image: quay.io/sharelatex/sharelatex-pro
-        image: sharelatex/sharelatex
+        image: sharelatex/sharelatex:with-texlive-full
         container_name: sharelatex
         depends_on:
             mongo:
@@ -69,41 +68,6 @@ services:
 
             # ENABLE_CRON_RESOURCE_DELETION: true
 
-            ################
-            ## Server Pro ##
-            ################
-
-            ## The Community Edition is intended for use in environments where all users are trusted and is not appropriate for
-            ## scenarios where isolation of users is required. Sandboxed Compiles are not available in the Community Edition,
-            ## so the following environment variables must be commented out to avoid compile issues.
-            ##
-            ## Sandboxed Compiles: https://docs.overleaf.com/on-premises/configuration/overleaf-toolkit/server-pro-only-configuration/sandboxed-compiles
-            SANDBOXED_COMPILES: 'true'
-            ### Bind-mount source for /var/lib/overleaf/data/compiles inside the container.
-            SANDBOXED_COMPILES_HOST_DIR_COMPILES: '/home/user/sharelatex_data/data/compiles'
-            ### Bind-mount source for /var/lib/overleaf/data/output inside the container.
-            SANDBOXED_COMPILES_HOST_DIR_OUTPUT: '/home/user/sharelatex_data/data/output'
-            ### Backwards compatibility (before Server Pro 5.5)
-            DOCKER_RUNNER: 'true'
-            SANDBOXED_COMPILES_SIBLING_CONTAINERS: 'true'
-
-            ## Works with test LDAP server shown at bottom of docker compose
-            # OVERLEAF_LDAP_URL: 'ldap://ldap:389'
-            # OVERLEAF_LDAP_SEARCH_BASE: 'ou=people,dc=planetexpress,dc=com'
-            # OVERLEAF_LDAP_SEARCH_FILTER: '(uid={{username}})'
-            # OVERLEAF_LDAP_BIND_DN: 'cn=admin,dc=planetexpress,dc=com'
-            # OVERLEAF_LDAP_BIND_CREDENTIALS: 'GoodNewsEveryone'
-            # OVERLEAF_LDAP_EMAIL_ATT: 'mail'
-            # OVERLEAF_LDAP_NAME_ATT: 'cn'
-            # OVERLEAF_LDAP_LAST_NAME_ATT: 'sn'
-            # OVERLEAF_LDAP_UPDATE_USER_DETAILS_ON_LOGIN: 'true'
-
-            # OVERLEAF_TEMPLATES_USER_ID: "578773160210479700917ee5"
-            # OVERLEAF_NEW_PROJECT_TEMPLATE_LINKS: '[ {"name":"All Templates","url":"/templates/all"}]'
-
-
-            # OVERLEAF_PROXY_LEARN: "true"
-
     mongo:
         restart: always
         image: mongo:6.0
@@ -150,3 +114,9 @@ services:
     #     volumes:
     #       - /var/run/docker.sock:/tmp/docker.sock:ro
     #       - /home/overleaf/tmp:/etc/nginx/certs
+
+
+
+# neues image sharelatex:with-texlive-full erstellt mit
+# docker exec sharelatex tlmgr install scheme-full   # installiert full tex live in virtuelle umgebung
+# docker commit sharelatex sharelatex/sharelatex:with-texlive-full # committed diese container variation in neues image in dem diese pakete ab start installiert sind
